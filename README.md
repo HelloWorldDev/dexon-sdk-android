@@ -1,9 +1,9 @@
-# TrustSDK-Android
-[![](https://jitpack.io/v/TrustWallet/TrustSdk-android.svg)](https://jitpack.io/#TrustWallet/TrustSdk-android)
+# DekuSanSDK-Android
+[![](https://jitpack.io/v/DekuSanWallet/DekuSanSdk-android.svg)](https://jitpack.io/#DekuSanWallet/DekuSanSdk-android)
 
 ## Getting started
 
-The TrustSDK lets you sign Ethereum transactions and messages so that you can bulid a native DApp without having to worry about keys or wallets. Follow these instructions to integrate TrustSDK in your native DApp.
+The DekuSanSDK lets you sign Ethereum transactions and messages so that you can bulid a native DApp without having to worry about keys or wallets. Follow these instructions to integrate DekuSanSDK in your native DApp.
 
 ## Demo
 
@@ -22,16 +22,16 @@ allprojects {
 2. Add dependency to your module:
 ```
 dependencies {
-    implementation 'com.github.TrustWallet:TrustSDK-Android:$version'
+    implementation 'com.github.DekuSanWallet:DekuSanSDK-Android:$version'
 }
 ```
 
-## Handle Trust callbacks
+## Handle DekuSan callbacks
 
-In your signing activity `Trust`.
+In your signing activity `DekuSan`.
 
 ```
-import Trust
+import DekuSan
 ```
 
 Override `onActivityResult` to obtain the signing result. Handle the response data and pass onSuccessListener and onFailureListener.
@@ -58,7 +58,7 @@ Override `onActivityResult` to obtain the signing result. Handle the response da
 To sign a transaction use this code:
 
 ```
-Trust.signTransaction()
+DekuSan.signTransaction()
     .recipient(Address("0x3637a62430C67Fe822f7136D2d9D74bDDd7A26C1"))
     .gasPrice(BigInteger.valueOf(16).multiply(BigInteger.TEN.pow(9)))
     .gasLimit(21000)
@@ -73,7 +73,7 @@ Trust.signTransaction()
 To sign a message use this code:
 
 ```
-Trust.signMessage()
+DekuSan.signMessage()
     .message("message to be signed")
     .call(this)
 ```
@@ -83,14 +83,14 @@ Trust.signMessage()
 To sign a personal message use this code:
 
 ```
-Trust.signPersonalMessage()
+DekuSan.signPersonalMessage()
     .message("message to be signed")
     .call(this)
 ```
 
 ## Example
 
-Trust SDK includes an example project with the above code. To run the example project clone the repo and build the project with Android Studio. Run the app on your emulator or device. Make sure that you have Trust Wallet installed on the device or simulator to test the full callback flow.
+DekuSan SDK includes an example project with the above code. To run the example project clone the repo and build the project with Android Studio. Run the app on your emulator or device. Make sure that you have DekuSan Wallet installed on the device or simulator to test the full callback flow.
 
 ## Authors
 
@@ -99,4 +99,4 @@ Trust SDK includes an example project with the above code. To run the example pr
 
 License
 
-TrustSDK is available under the MIT license. See the LICENSE file for more info.
+DekuSanSDK is available under the MIT license. See the LICENSE file for more info.

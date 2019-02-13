@@ -21,7 +21,6 @@
 # Generated files
 bin/
 gen/
-Trust-strings.zip
 
 # Gradle files
 .gradle/
