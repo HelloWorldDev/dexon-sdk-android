@@ -1,9 +1,9 @@
 # DekuSanSDK-Android
-[![](https://jitpack.io/v/DekuSanWallet/DekuSanSdk-android.svg)](https://jitpack.io/#DekuSanWallet/DekuSanSdk-android)
+[![](https://jitpack.io/v/dexon-foundation/dekusan-sdk-android.svg)](https://jitpack.io/#dexon-foundation/dekusan-sdk-android/)
 
 ## Getting started
 
-The DekuSanSDK lets you sign Ethereum transactions and messages so that you can bulid a native DApp without having to worry about keys or wallets. Follow these instructions to integrate DekuSanSDK in your native DApp.
+The DekuSanSDK lets you sign Dexon and Ethereum transactions and messages so that you can bulid a native DApp without having to worry about keys or wallets. Follow these instructions to integrate DekuSanSDK in your native DApp.
 
 ## Demo
 
@@ -22,7 +22,7 @@ allprojects {
 2. Add dependency to your module:
 ```
 dependencies {
-    implementation 'com.github.DekuSanWallet:DekuSanSDK-Android:$version'
+    implementation 'com.github.dexon-foundation:dekusan-sdk-android:$version'
 }
 ```
 
