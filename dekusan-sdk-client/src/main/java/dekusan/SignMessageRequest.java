@@ -7,7 +7,8 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import trust.core.entity.Message;
+import org.dexon.dekusan.core.model.Message;
+
 
 public final class SignMessageRequest extends BaseSignMessageRequest<String> implements Request, Parcelable {
 
@@ -71,11 +72,6 @@ public final class SignMessageRequest extends BaseSignMessageRequest<String> imp
             return this;
         }
 
-        public Builder leafPosition(long leafPosition) {
-            this.leafPosition = leafPosition;
-            return this;
-        }
-
         public Builder callbackUri(String callbackUri) {
             this.callbackUri = callbackUri;
             return this;
@@ -90,14 +86,11 @@ public final class SignMessageRequest extends BaseSignMessageRequest<String> imp
             message = new String(Base64.decode(value, Base64.DEFAULT));
             url = uri.getQueryParameter(DekuSan.ExtraKey.URL);
             callbackUri = uri.getQueryParameter(DekuSan.ExtraKey.CALLBACK_URI);
-            try {
-                leafPosition = Long.valueOf(uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION));
-            } catch (NumberFormatException ex) { /* Quietly */ }
             return this;
         }
 
         public Builder message(Message<String> message) {
-            message(message.value).leafPosition(message.leafPosition).url(message.url);
+            message(message.value).url(message.url);
             return this;
         }
 
@@ -108,7 +101,7 @@ public final class SignMessageRequest extends BaseSignMessageRequest<String> imp
                     callbackUri = Uri.parse(this.callbackUri);
                 } catch (Exception ex) { /* Quietly */ }
             }
-            Message<String> message = new Message<>(this.message, url, leafPosition);
+            Message<String> message = new Message<>(this.message, url);
             return new SignMessageRequest(message, callbackUri);
         }
 

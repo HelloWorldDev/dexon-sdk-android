@@ -1,16 +1,18 @@
 package org.dexon.dekusan.walletapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.gson.Gson
 import dekusan.SignRequestHelper
-import trust.core.entity.Message
-import trust.core.entity.Transaction
-import trust.core.entity.TypedData
+import org.dexon.dekusan.core.model.Message
+import org.dexon.dekusan.core.model.Transaction
+import pm.gnosis.eip712.adapters.moshi.MoshiAdapter
 
 class MainActivity : AppCompatActivity(), SignRequestHelper.Callback {
+
     private lateinit var signHelper: SignRequestHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,6 +20,22 @@ class MainActivity : AppCompatActivity(), SignRequestHelper.Callback {
         setContentView(R.layout.activity_main)
 
         signHelper = SignRequestHelper(intent, this)
+    }
+
+    override fun sendTransaction(transaction: Transaction?) {
+        transaction?.let {
+            Log.d("WALLET_APP", "Message: " + it.value.toString() + ":" + it.to.toString())
+            AlertDialog.Builder(this)
+                .setMessage(transaction.toString())
+                .setNegativeButton("cancel") { dialog, wich ->
+                    signHelper.onSignCancel(this@MainActivity)
+                }
+                .setPositiveButton("ok") { dialog, which ->
+                    signHelper.onTransactionSent(this, "".toByteArray())
+                }
+                .show()
+
+        }
     }
 
     override fun signMessage(message: Message<String>?) {
@@ -36,7 +54,7 @@ class MainActivity : AppCompatActivity(), SignRequestHelper.Callback {
         }
     }
 
-    override fun signTypedMessage(message: Message<Array<TypedData>>?) {
+    override fun signTypedMessage(message: Message<Array<MoshiAdapter.TypedData>>?) {
         message?.let {
             Log.d("WALLET_APP", "Message: " + message.value)
             AlertDialog.Builder(this)
@@ -70,7 +88,7 @@ class MainActivity : AppCompatActivity(), SignRequestHelper.Callback {
 
     override fun signTransaction(transaction: Transaction?) {
         transaction?.let {
-            Log.d("WALLET_APP", "Message: " + it.value.toString() + ":" + it.recipient.toString())
+            Log.d("WALLET_APP", "Message: " + it.value.toString() + ":" + it.to.toString())
         }
     }
 }

@@ -5,8 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Base64;
-
-import trust.core.entity.Message;
+import org.dexon.dekusan.core.model.Message;
 
 public class BaseSignMessageRequest<V> implements Request, Parcelable {
 
@@ -33,8 +32,7 @@ public class BaseSignMessageRequest<V> implements Request, Parcelable {
                 .scheme("dekusan")
                 .authority(getAuthority())
                 .appendQueryParameter(DekuSan.ExtraKey.MESSAGE, new String(value))
-                .appendQueryParameter(DekuSan.ExtraKey.URL, message.url)
-                .appendQueryParameter(DekuSan.ExtraKey.LEAF_POSITION, String.valueOf(message.leafPosition));
+                .appendQueryParameter(DekuSan.ExtraKey.URL, message.url);
         if (callbackUri != null) {
             uriBuilder.appendQueryParameter("callback", callbackUri.toString());
         }

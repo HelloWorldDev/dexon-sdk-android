@@ -17,6 +17,9 @@
             </intent-filter>
             <intent-filter>
                 <data
+                    android:host="send-transaction"
+                    android:scheme="dekusan" />
+                <data
                     android:host="sign-transaction"
                     android:scheme="dekusan" />
                 <data

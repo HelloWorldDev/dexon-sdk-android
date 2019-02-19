@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import trust.core.entity.Message;
+import org.dexon.dekusan.core.model.Message;
 
 public final class SignPersonalMessageRequest extends BaseSignMessageRequest<String> implements Request, Parcelable {
 
@@ -57,7 +57,6 @@ public final class SignPersonalMessageRequest extends BaseSignMessageRequest<Str
 
     public static class Builder {
         private String message;
-        private long leafPosition;
         private String callbackUri;
         private String url;
 
@@ -68,11 +67,6 @@ public final class SignPersonalMessageRequest extends BaseSignMessageRequest<Str
 
         public Builder url(String url) {
             this.url = url;
-            return this;
-        }
-
-        public Builder leafPosition(long leafPosition) {
-            this.leafPosition = leafPosition;
             return this;
         }
 
@@ -90,14 +84,11 @@ public final class SignPersonalMessageRequest extends BaseSignMessageRequest<Str
             message = new String(Base64.decode(value, Base64.DEFAULT));
             url = uri.getQueryParameter(DekuSan.ExtraKey.URL);
             callbackUri = uri.getQueryParameter(DekuSan.ExtraKey.CALLBACK_URI);
-            try {
-                leafPosition = Long.valueOf(uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION));
-            } catch (NumberFormatException ex) { /* Quietly */ }
             return this;
         }
 
         public Builder message(Message<String> message) {
-            message(message.value).leafPosition(message.leafPosition).url(message.url);
+            message(message.value).url(message.url);
             return this;
         }
 
@@ -108,7 +99,7 @@ public final class SignPersonalMessageRequest extends BaseSignMessageRequest<Str
                     callbackUri = Uri.parse(this.callbackUri);
                 } catch (Exception ex) { /* Quietly */ }
             }
-            Message<String> message = new Message<>(this.message, url, leafPosition);
+            Message<String> message = new Message<>(this.message, url);
             return new SignPersonalMessageRequest(message, callbackUri);
         }
 

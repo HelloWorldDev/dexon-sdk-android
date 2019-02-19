@@ -7,11 +7,12 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.dexon.dekusan.core.model.Address;
+import org.dexon.dekusan.core.model.Transaction;
+import org.walleth.khex.HexFunKt;
+
 import java.math.BigInteger;
 
-import trust.core.entity.Address;
-import trust.core.entity.Transaction;
-import trust.core.util.Hex;
 
 public class SignTransactionRequest implements Request, Parcelable {
     private final Transaction transaction;
@@ -34,7 +35,7 @@ public class SignTransactionRequest implements Request, Parcelable {
         Uri.Builder uriBuilder = new Uri.Builder()
                 .scheme("dekusan")
                 .authority(DekuSan.ACTION_SIGN_TRANSACTION)
-                .appendQueryParameter(DekuSan.ExtraKey.RECIPIENT,
+                /*.appendQueryParameter(DekuSan.ExtraKey.RECIPIENT,
                         transaction.recipient == null ? "" : transaction.recipient.toString())
                 .appendQueryParameter(DekuSan.ExtraKey.CONTRACT,
                         transaction.contract == null ? "" : transaction.contract.toString())
@@ -45,7 +46,7 @@ public class SignTransactionRequest implements Request, Parcelable {
                 .appendQueryParameter(DekuSan.ExtraKey.GAS_LIMIT, String.valueOf(transaction.gasLimit))
                 .appendQueryParameter(DekuSan.ExtraKey.NONCE, String.valueOf(transaction.nonce))
                 .appendQueryParameter(DekuSan.ExtraKey.PAYLOAD, transaction.payload)
-                .appendQueryParameter(DekuSan.ExtraKey.LEAF_POSITION, String.valueOf(transaction.leafPosition));
+                .appendQueryParameter(DekuSan.ExtraKey.LEAF_POSITION, String.valueOf(transaction.leafPosition))*/;
         if (callbackUri != null) {
             uriBuilder.appendQueryParameter("callback", callbackUri.toString());
         }
@@ -61,6 +62,7 @@ public class SignTransactionRequest implements Request, Parcelable {
     public Uri key() {
         return uri;
     }
+
 
     @Nullable
     @Override
@@ -135,7 +137,7 @@ public class SignTransactionRequest implements Request, Parcelable {
         }
 
         public Builder payload(byte[] payload) {
-            this.payload = Hex.byteArrayToHexString(payload);
+            this.payload = HexFunKt.toHexString(payload, "");
             return this;
         }
 
@@ -165,14 +167,14 @@ public class SignTransactionRequest implements Request, Parcelable {
         }
 
         public Builder transaction(Transaction transaction) {
-            recipient(transaction.recipient)
+            /*recipient(transaction.recipient)
                     .contractAddress(transaction.contract)
                     .value(transaction.value)
                     .gasLimit(transaction.gasLimit)
                     .gasPrice(transaction.gasPrice)
                     .payload(transaction.payload)
                     .nonce(transaction.nonce)
-                    .leafPosition(transaction.leafPosition);
+                    .leafPosition(transaction.leafPosition);*/
             return this;
         }
 
@@ -183,7 +185,6 @@ public class SignTransactionRequest implements Request, Parcelable {
             String gasPrice = uri.getQueryParameter(DekuSan.ExtraKey.GAS_PRICE);
             String gasLimit = uri.getQueryParameter(DekuSan.ExtraKey.GAS_LIMIT);
             String nonce = uri.getQueryParameter(DekuSan.ExtraKey.NONCE);
-            String leafPosition = uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION);
             recipient(TextUtils.isEmpty(recipient) ? null : new Address(recipient));
             try {
                 value(TextUtils.isEmpty(value) ? BigInteger.ZERO : new BigInteger(value));
@@ -194,9 +195,6 @@ public class SignTransactionRequest implements Request, Parcelable {
             try {
                 gasLimit(Long.valueOf(gasLimit));
             } catch (Exception ex) { /* Quietly */ }
-            try {
-                leafPosition(Long.valueOf(leafPosition));
-            } catch (NumberFormatException ex) { /* Quietly */ }
             payload(uri.getQueryParameter(DekuSan.ExtraKey.PAYLOAD));
             contractAddress(TextUtils.isEmpty(contract) ? null : new Address(contract));
             try {
@@ -207,8 +205,7 @@ public class SignTransactionRequest implements Request, Parcelable {
         }
 
         public SignTransactionRequest get() {
-            Transaction transaction = new Transaction(
-                    recipient, contract, value, gasPrice, gasLimit, nonce, payload, leafPosition);
+            Transaction transaction = new Transaction();
             Uri callbackUri = null;
             if (!TextUtils.isEmpty(this.callbackUri)) {
                 try {

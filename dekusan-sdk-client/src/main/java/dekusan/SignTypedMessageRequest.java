@@ -11,18 +11,19 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.dexon.dekusan.core.model.Message;
+
 import java.lang.reflect.Type;
 
-import trust.core.entity.Message;
-import trust.core.entity.TypedData;
+import pm.gnosis.eip712.adapters.moshi.MoshiAdapter;
 
-public final class SignTypedMessageRequest extends BaseSignMessageRequest<TypedData[]> implements Request, Parcelable {
+public final class SignTypedMessageRequest extends BaseSignMessageRequest<MoshiAdapter.TypedData[]> implements Request, Parcelable {
 
     public static SignTypedMessageRequest.Builder builder() {
         return new SignTypedMessageRequest.Builder();
     }
 
-    private SignTypedMessageRequest(Message<TypedData[]> message, Uri callbackUri) {
+    private SignTypedMessageRequest(Message<MoshiAdapter.TypedData[]> message, Uri callbackUri) {
         super(message, callbackUri);
     }
 
@@ -32,7 +33,7 @@ public final class SignTypedMessageRequest extends BaseSignMessageRequest<TypedD
 
     @Override
     byte[] getData() {
-        Message<TypedData[]> body = body();
+        Message<MoshiAdapter.TypedData[]> body = body();
         return new Gson().toJson(body.value).getBytes();
     }
 
@@ -64,23 +65,18 @@ public final class SignTypedMessageRequest extends BaseSignMessageRequest<TypedD
     };
 
     public static class Builder {
-        private TypedData[] message;
+        private MoshiAdapter.TypedData[] message;
         private long leafPosition;
         private String callbackUri;
         private String url;
 
-        public Builder message(TypedData... message) {
+        public Builder message(MoshiAdapter.TypedData... message) {
             this.message = message;
             return this;
         }
 
         public Builder url(String url) {
             this.url = url;
-            return this;
-        }
-
-        public Builder leafPosition(long leafPosition) {
-            this.leafPosition = leafPosition;
             return this;
         }
 
@@ -95,19 +91,16 @@ public final class SignTypedMessageRequest extends BaseSignMessageRequest<TypedD
             }
 
             String value = uri.getQueryParameter(DekuSan.ExtraKey.MESSAGE);
-            Type type = new TypeToken<TypedData[]>() {}.getType();
+            Type type = new TypeToken<MoshiAdapter.TypedData[]>() {}.getType();
             String json = new String(Base64.decode(value, Base64.DEFAULT));
             Log.e("JSON", json);
             message = new Gson().fromJson(json, type);
             callbackUri = uri.getQueryParameter(DekuSan.ExtraKey.CALLBACK_URI);
-            try {
-                leafPosition = Long.valueOf(uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION));
-            } catch (NumberFormatException ex) { /* Quietly */ }
             return this;
         }
 
-        public Builder message(Message<TypedData[]> message) {
-            message(message.value).leafPosition(message.leafPosition).url(message.url);
+        public Builder message(Message<MoshiAdapter.TypedData[]> message) {
+            message(message.value).url(message.url);
             return this;
         }
 
@@ -118,7 +111,7 @@ public final class SignTypedMessageRequest extends BaseSignMessageRequest<TypedD
                     callbackUri = Uri.parse(this.callbackUri);
                 } catch (Exception ex) { /* Quietly */ }
             }
-            Message<TypedData[]> message = new Message<>(this.message, url, leafPosition);
+            Message<MoshiAdapter.TypedData[]> message = new Message<>(this.message, url);
             return new SignTypedMessageRequest(message, callbackUri);
         }
 

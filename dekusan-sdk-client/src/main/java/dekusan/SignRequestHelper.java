@@ -8,12 +8,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Base64;
 
+import org.dexon.dekusan.core.model.Message;
+import org.dexon.dekusan.core.model.Transaction;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import trust.core.entity.Message;
-import trust.core.entity.Transaction;
-import trust.core.entity.TypedData;
+
+import pm.gnosis.eip712.adapters.moshi.MoshiAdapter;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -29,7 +31,7 @@ public class SignRequestHelper implements Parcelable {
         add(DekuSan.ACTION_SIGN_MESSAGE);
         add(DekuSan.ACTION_SIGN_PERSONAL_MESSAGE);
         add(DekuSan.ACTION_SIGN_TYPED_MESSAGE);
-
+        add(DekuSan.ACTION_SEND_TRANSACTION);
     }};
 
     public SignRequestHelper(Intent intent, Callback callback) {
@@ -44,21 +46,30 @@ public class SignRequestHelper implements Parcelable {
                 request = SignMessageRequest.builder().uri(uri).get();
                 Message<String> message = request.body();
                 callback.signMessage(message);
-            } break;
+            }
+            break;
             case DekuSan.ACTION_SIGN_PERSONAL_MESSAGE: {
                 request = SignPersonalMessageRequest.builder().uri(uri).get();
                 Message<String> message = request.body();
                 callback.signPersonalMessage(message);
-            } break;
+            }
+            break;
             case DekuSan.ACTION_SIGN_TYPED_MESSAGE: {
                 request = SignTypedMessageRequest.builder().uri(uri).get();
-                Message<TypedData[]> message = request.body();
+                Message<MoshiAdapter.TypedData[]> message = request.body();
                 callback.signTypedMessage(message);
-            } break;
+            }
+            break;
             case DekuSan.ACTION_SIGN_TRANSACTION: {
                 request = SignTransactionRequest.builder().uri(uri).get();
                 callback.signTransaction((Transaction) request.body());
-            } break;
+            }
+            break;
+            case DekuSan.ACTION_SEND_TRANSACTION: {
+                request = SendTransactionRequest.Companion.builder().uri(uri).get();
+                callback.sendTransaction((Transaction) request.body());
+            }
+            break;
         }
     }
 
@@ -79,6 +90,10 @@ public class SignRequestHelper implements Parcelable {
     }
 
     public void onTransactionSigned(Activity activity, byte[] sign) {
+        success(activity, sign);
+    }
+
+    public void onTransactionSent(Activity activity, byte[] sign) {
         success(activity, sign);
     }
 
@@ -174,8 +189,10 @@ public class SignRequestHelper implements Parcelable {
 
         void signPersonalMessage(Message<String> message);
 
-        void signTypedMessage(Message<TypedData[]> message);
+        void signTypedMessage(Message<MoshiAdapter.TypedData[]> message);
 
         void signTransaction(Transaction transaction);
+
+        void sendTransaction(Transaction transaction);
     }
 }

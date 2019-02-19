@@ -44,3 +44,6 @@ proguard/
 
 ### Android Patch ###
 gen-external-apklibs
+
+# Avoid ignoring Gradle wrapper jar file
+!gradle-wrapper.jar

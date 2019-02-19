@@ -9,6 +9,7 @@ import android.net.Uri;
 public abstract class DekuSan {
 
     public static final String ACTION_SIGN_TRANSACTION = "sign-transaction";
+    public static final String ACTION_SEND_TRANSACTION = "send-transaction";
     public static final String ACTION_SIGN_MESSAGE = "sign-message";
     public static final String ACTION_SIGN_PERSONAL_MESSAGE = "sign-personal-message";
     public static final String ACTION_SIGN_TYPED_MESSAGE = "sign-typed-message";
@@ -27,6 +28,10 @@ public abstract class DekuSan {
 
     public static SignTransactionRequest.Builder signTransaction() {
         return SignTransactionRequest.builder();
+    }
+
+    public static SendTransactionRequest.Builder sendTransaction() {
+        return SendTransactionRequest.builder();
     }
 
     public static SignMessageRequest.Builder signMessage() {
@@ -76,7 +81,7 @@ public abstract class DekuSan {
         String CONTRACT = "contract";
         String PAYLOAD = "data";
         String NONCE = "nonce";
-        String LEAF_POSITION = "leaf_position";
+//        String LEAF_POSITION = "leaf_position";
         String MESSAGE = "message";
         String URL = "url";
         String CALLBACK_URI = "callback";

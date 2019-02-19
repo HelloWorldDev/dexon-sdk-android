@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.dexon-foundation'
 version = '0.1.0'
@@ -31,14 +33,21 @@ android {
     }
 }
 
+androidExtensions {
+    experimental = true
+}
+
 project.ext {
     supportVersion = "28.0.0"
     trustCoreVersion = "0.01.6"
     gsonVersion = "2.8.5"
+    kethereum_version = "0.68"
 }
 
 dependencies {
-    api "com.github.TrustWallet:TrustCoreAndroid:$project.trustCoreVersion"
+    api 'com.github.dexon-foundation:dekusan-core-android:0.1.0'
+    api "com.github.walleth.kethereum:functions:$project.kethereum_version"
+    api "com.github.walleth.kethereum:wallet:$project.kethereum_version"
 
     implementation "com.google.code.gson:gson:$project.gsonVersion"
     implementation "com.android.support:appcompat-v7:$project.supportVersion"
