@@ -10,11 +10,11 @@ import org.dexon.dekusan.core.functions.isTokenTransfer
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.ChainDefinition
 import org.dexon.dekusan.core.model.Transaction
-import org.dexon.dekusan.core.model.createTransactionWithDefaults
+import org.kethereum.DEFAULT_GAS_LIMIT
+import org.kethereum.DEFAULT_GAS_PRICE
 import org.walleth.khex.hexToByteArray
 import org.walleth.khex.toHexString
-
-
+import pm.gnosis.utils.isValidEthereumAddress
 import java.math.BigInteger
 
 class SendTransactionRequest : Request, Parcelable {
@@ -57,7 +57,7 @@ class SendTransactionRequest : Request, Parcelable {
     }
 
     class Builder {
-
+        private var from: Address? = null
         private var recipient: Address? = null
         private var value = BigInteger.ZERO
         private var gasPrice = BigInteger.ZERO
@@ -67,6 +67,11 @@ class SendTransactionRequest : Request, Parcelable {
         private var nonce: Long = 0
         private var leafPosition: Long = 0
         private var callbackUri: String? = null
+
+        fun from(from: Address?): Builder {
+            this.from = from
+            return this
+        }
 
         fun recipient(recipient: Address?): Builder {
             this.recipient = recipient
@@ -127,7 +132,8 @@ class SendTransactionRequest : Request, Parcelable {
         }
 
         fun transaction(transaction: Transaction): Builder {
-            recipient(if (transaction.isTokenTransfer()) transaction.getTokenTransferTo() else transaction.to)
+            from(transaction.from)
+                .recipient(if (transaction.isTokenTransfer()) transaction.getTokenTransferTo() else transaction.to)
                 .contractAddress(transaction.getTokenTransferTo())
                 .value(transaction.value)
                 .gasLimit(transaction.gasLimit.toLong())
@@ -138,41 +144,22 @@ class SendTransactionRequest : Request, Parcelable {
         }
 
         fun uri(uri: Uri): Builder {
+            val from = uri.getQueryParameter(DekuSan.ExtraKey.FROM)
             val recipient = uri.getQueryParameter(DekuSan.ExtraKey.RECIPIENT)
             val value = uri.getQueryParameter(DekuSan.ExtraKey.VALUE)
             val contract = uri.getQueryParameter(DekuSan.ExtraKey.CONTRACT)
             val gasPrice = uri.getQueryParameter(DekuSan.ExtraKey.GAS_PRICE)
             val gasLimit = uri.getQueryParameter(DekuSan.ExtraKey.GAS_LIMIT)
             val nonce = uri.getQueryParameter(DekuSan.ExtraKey.NONCE)
-            recipient(if (TextUtils.isEmpty(recipient)) null else Address(
-                recipient!!
-            )
-            )
-            try {
-                value(if (TextUtils.isEmpty(value)) BigInteger.ZERO else BigInteger(value))
-            } catch (ex: Exception) { /* Quietly */
-            }
-
-            try {
-                gasPrice(if (TextUtils.isEmpty(gasPrice)) BigInteger.ZERO else BigInteger(gasPrice))
-            } catch (ex: Exception) { /* Quietly */
-            }
-
-            try {
-                gasLimit(java.lang.Long.valueOf(gasLimit!!))
-            } catch (ex: Exception) { /* Quietly */
-            }
-
+            from?.takeIf { it.isValidEthereumAddress() }?.apply { from(Address(this)) }
+            recipient?.takeIf { it.isValidEthereumAddress() }?.apply { recipient(Address(this)) }
+            value(value?.toBigIntegerOrNull() ?: BigInteger.ZERO)
+            gasPrice(gasPrice?.toBigIntegerOrNull() ?: BigInteger.ZERO)
+            gasLimit(gasLimit?.toLongOrNull() ?: 0L)
             payload(uri.getQueryParameter(DekuSan.ExtraKey.PAYLOAD))
-            contractAddress(if (TextUtils.isEmpty(contract)) null else Address(
-                contract!!
-            )
-            )
-            try {
-                nonce(java.lang.Long.valueOf(nonce!!))
-            } catch (ex: Exception) { /* Quietly */
-            }
-
+            contract?.takeIf { it.isValidEthereumAddress() }
+                ?.apply { contractAddress(Address(this)) }
+            nonce(nonce?.toLongOrNull() ?: 0L)
             callbackUri(uri.getQueryParameter("callback"))
             return this
         }
@@ -180,7 +167,7 @@ class SendTransactionRequest : Request, Parcelable {
         fun get(): SendTransactionRequest {
             val transaction = createTransactionWithDefaults(
                 chain = ChainDefinition(238L, "DXN"),
-                from = Address(""),
+                from = from,
                 gasLimit = gasLimit.toBigInteger(),
                 gasPrice = gasPrice,
                 input = payload?.hexToByteArray()?.toList() ?: emptyList(),
@@ -211,8 +198,12 @@ class SendTransactionRequest : Request, Parcelable {
                 .scheme("dekusan")
                 .authority(DekuSan.ACTION_SEND_TRANSACTION)
                 .appendQueryParameter(
+                    DekuSan.ExtraKey.FROM,
+                    transaction.from?.toString().orEmpty()
+                )
+                .appendQueryParameter(
                     DekuSan.ExtraKey.RECIPIENT,
-                    if (transaction.to == null) "" else transaction.to!!.toString()
+                    transaction.to?.toString().orEmpty()
                 )
                 .appendQueryParameter(
                     DekuSan.ExtraKey.CONTRACT,
@@ -220,11 +211,11 @@ class SendTransactionRequest : Request, Parcelable {
                 )
                 .appendQueryParameter(
                     DekuSan.ExtraKey.VALUE,
-                    if (transaction.value == null) "0" else transaction.value.toString()
+                    transaction.value.toString()
                 )
                 .appendQueryParameter(
                     DekuSan.ExtraKey.GAS_PRICE,
-                    if (transaction.gasPrice == null) "0" else transaction.gasPrice.toString()
+                    transaction.gasPrice.toString()
                 )
                 .appendQueryParameter(DekuSan.ExtraKey.GAS_LIMIT, transaction.gasLimit.toString())
                 .appendQueryParameter(DekuSan.ExtraKey.NONCE, transaction.nonce.toString())
@@ -253,6 +244,30 @@ class SendTransactionRequest : Request, Parcelable {
             }
     }
 }
+
+fun createTransactionWithDefaults(
+    chain: ChainDefinition? = null,
+    creationEpochSecond: Long? = null,
+    from: Address?,
+    gasLimit: BigInteger = DEFAULT_GAS_LIMIT,
+    gasPrice: BigInteger = DEFAULT_GAS_PRICE,
+    input: List<Byte> = emptyList(),
+    nonce: BigInteger? = null,
+    to: Address?,
+    txHash: String? = null,
+    value: BigInteger
+) = Transaction(
+    chain,
+    creationEpochSecond,
+    from,
+    gasLimit,
+    gasPrice,
+    input,
+    nonce,
+    to,
+    txHash,
+    value
+)
 
 fun <T : Parcelable> Parcel.readParcelable(creator: Parcelable.Creator<T>): T? {
     return if (readString() != null) creator.createFromParcel(this) else null

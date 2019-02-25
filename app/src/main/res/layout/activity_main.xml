@@ -1,39 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:orientation="vertical"
+    android:padding="16dp">
+
     <Button
         android:id="@+id/sign_transaction"
-        android:text="@string/sign_transaction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:text="@string/sign_transaction" />
+
     <Button
         android:id="@+id/sign_message"
-        android:text="@string/sign_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:text="@string/sign_message" />
+
     <Button
         android:id="@+id/sign_personal_message"
-        android:text="@string/sign_personal_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:text="@string/sign_personal_message" />
+
     <Button
         android:id="@+id/sign_typed_message"
-        android:text="@string/sign_typed_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:text="@string/sign_typed_message" />
+
     <Button
         android:id="@+id/sign_msg_with_callback"
-        android:text="@string/sign_msg_with_callback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:text="@string/sign_msg_with_callback" />
 </LinearLayout>

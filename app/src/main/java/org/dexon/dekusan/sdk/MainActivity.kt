@@ -9,9 +9,6 @@ import android.widget.Button
 import com.squareup.moshi.Moshi
 import dekusan.*
 import org.dexon.dekusan.core.model.Address
-import pm.gnosis.eip712.DomainWithMessage
-import pm.gnosis.eip712.EIP712JsonAdapter
-import pm.gnosis.eip712.EIP712JsonParser
 import pm.gnosis.eip712.adapters.moshi.MoshiAdapter
 import pm.gnosis.utils.hexStringToByteArray
 import java.math.BigDecimal
@@ -31,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.sign_transaction).setOnClickListener {
             sendTransactionCall = DekuSan.sendTransaction()
+                .from(Address("0x9BCA773A36ECD81e08991982B24497adb7039E17"))
                 .recipient(Address("0x3637a62430C67Fe822f7136D2d9D74bDDd7A26C1"))
                 .gasPrice(BigInteger.valueOf(16000000000))
                 .gasLimit(21000)

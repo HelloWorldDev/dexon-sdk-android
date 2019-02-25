@@ -74,6 +74,7 @@ public abstract class DekuSan {
     interface ExtraKey {
         String SIGN = "sign";
         String ERROR = "error";
+        String FROM = "from";
         String RECIPIENT = "to";
         String VALUE = "amount";
         String GAS_PRICE = "gasPrice";
