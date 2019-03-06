@@ -18,6 +18,9 @@ import pm.gnosis.utils.isValidEthereumAddress
 import java.math.BigInteger
 
 class SendTransactionRequest : Request, Parcelable {
+
+    override fun getChain(): Blockchain = Blockchain.DEXON
+
     private val transaction: Transaction?
     private val callbackUri: Uri?
     private val uri: Uri?

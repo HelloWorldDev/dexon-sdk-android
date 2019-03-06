@@ -26,10 +26,6 @@ public abstract class DekuSan {
         DekuSan.packageName = packageName;
     }
 
-    public static SignTransactionRequest.Builder signTransaction() {
-        return SignTransactionRequest.builder();
-    }
-
     public static SendTransactionRequest.Builder sendTransaction() {
         return SendTransactionRequest.builder();
     }
@@ -86,6 +82,7 @@ public abstract class DekuSan {
         String MESSAGE = "message";
         String URL = "url";
         String CALLBACK_URI = "callback";
+        String BLOCKCHAIN = "blockchain";
     }
 
     public interface ErrorCode {

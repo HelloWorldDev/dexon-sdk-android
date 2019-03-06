@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import org.dexon.dekusan.core.model.Message;
+import org.jetbrains.annotations.NotNull;
 
 public final class SignPersonalMessageRequest extends BaseSignMessageRequest<String> implements Request, Parcelable {
 
@@ -16,20 +17,22 @@ public final class SignPersonalMessageRequest extends BaseSignMessageRequest<Str
     }
 
     private SignPersonalMessageRequest(Message<String> message, Uri callbackUri) {
-        super(message, callbackUri);
+        super(Blockchain.DEXON, message, callbackUri);
     }
 
     private SignPersonalMessageRequest(Parcel in) {
         super(in);
     }
 
+    @NotNull
     @Override
-    byte[] getData() {
+    protected byte[] getData() {
         return ((Message<String>) body()).value.getBytes();
     }
 
+    @NotNull
     @Override
-    String getAuthority() {
+    protected String getAuthority() {
         return DekuSan.ACTION_SIGN_PERSONAL_MESSAGE;
     }
 
@@ -43,6 +46,7 @@ public final class SignPersonalMessageRequest extends BaseSignMessageRequest<Str
         super.writeToParcel(dest, flags);
     }
 
+/*
     public static final Creator<SignPersonalMessageRequest> CREATOR = new Creator<SignPersonalMessageRequest>() {
         @Override
         public SignPersonalMessageRequest createFromParcel(Parcel in) {
@@ -54,6 +58,7 @@ public final class SignPersonalMessageRequest extends BaseSignMessageRequest<Str
             return new SignPersonalMessageRequest[size];
         }
     };
+*/
 
     public static class Builder {
         private String message;

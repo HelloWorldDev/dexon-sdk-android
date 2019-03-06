@@ -14,7 +14,6 @@ import org.dexon.dekusan.core.model.Transaction;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import pm.gnosis.eip712.adapters.moshi.MoshiAdapter;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -60,11 +59,6 @@ public class SignRequestHelper implements Parcelable {
                 callback.signTypedMessage(message);
             }
             break;
-            case DekuSan.ACTION_SIGN_TRANSACTION: {
-                request = SignTransactionRequest.builder().uri(uri).get();
-                callback.signTransaction((Transaction) request.body());
-            }
-            break;
             case DekuSan.ACTION_SEND_TRANSACTION: {
                 request = SendTransactionRequest.Companion.builder().uri(uri).get();
                 callback.sendTransaction((Transaction) request.body());
@@ -75,6 +69,10 @@ public class SignRequestHelper implements Parcelable {
 
     protected SignRequestHelper(Parcel in) {
         request = in.readParcelable(Request.class.getClassLoader());
+    }
+
+    public Blockchain getChain() {
+        return request.getChain();
     }
 
     public void onSignCancel(Activity activity) {

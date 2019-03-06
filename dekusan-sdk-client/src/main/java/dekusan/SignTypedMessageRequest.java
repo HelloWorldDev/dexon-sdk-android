@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.dexon.dekusan.core.model.Message;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
@@ -24,21 +25,23 @@ public final class SignTypedMessageRequest extends BaseSignMessageRequest<MoshiA
     }
 
     private SignTypedMessageRequest(Message<MoshiAdapter.TypedData[]> message, Uri callbackUri) {
-        super(message, callbackUri);
+        super(Blockchain.DEXON, message, callbackUri);
     }
 
     private SignTypedMessageRequest(Parcel in) {
         super(in);
     }
 
+    @NotNull
     @Override
-    byte[] getData() {
+    protected byte[] getData() {
         Message<MoshiAdapter.TypedData[]> body = body();
         return new Gson().toJson(body.value).getBytes();
     }
 
+    @NotNull
     @Override
-    String getAuthority() {
+    protected String getAuthority() {
         return DekuSan.ACTION_SIGN_TYPED_MESSAGE;
     }
 
@@ -52,6 +55,7 @@ public final class SignTypedMessageRequest extends BaseSignMessageRequest<MoshiA
         super.writeToParcel(dest, flags);
     }
 
+/*
     public static final Creator<SignTypedMessageRequest> CREATOR = new Creator<SignTypedMessageRequest>() {
         @Override
         public SignTypedMessageRequest createFromParcel(Parcel in) {
@@ -63,6 +67,7 @@ public final class SignTypedMessageRequest extends BaseSignMessageRequest<MoshiA
             return new SignTypedMessageRequest[size];
         }
     };
+*/
 
     public static class Builder {
         private MoshiAdapter.TypedData[] message;

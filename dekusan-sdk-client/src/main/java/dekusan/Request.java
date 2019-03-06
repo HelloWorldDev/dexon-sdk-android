@@ -13,4 +13,6 @@ public interface Request extends Parcelable {
     @Nullable
     Uri getCallbackUri();
 
+    Blockchain getChain();
+
 }
