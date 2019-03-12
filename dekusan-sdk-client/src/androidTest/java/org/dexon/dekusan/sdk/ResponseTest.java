@@ -5,9 +5,9 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import dekusan.Response;
-import dekusan.SignTransactionRequest;
 import dekusan.DekuSan;
+import dekusan.Response;
+import dekusan.SendTransactionRequest;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -27,11 +27,11 @@ public class ResponseTest {
         assertFalse(response.isAvailable());
         response = new Response(null, "0x", DekuSan.ErrorCode.NONE);
         assertFalse(response.isAvailable());
-        response = new Response(SignTransactionRequest.builder().get(), "0x", DekuSan.ErrorCode.NONE);
+        response = new Response(SendTransactionRequest.builder().get(), "0x", DekuSan.ErrorCode.NONE);
         assertTrue(response.isAvailable());
-        response = new Response(SignTransactionRequest.builder().get(), null, DekuSan.ErrorCode.NONE);
+        response = new Response(SendTransactionRequest.builder().get(), null, DekuSan.ErrorCode.NONE);
         assertFalse(response.isAvailable());
-        response = new Response(SignTransactionRequest.builder().get(), "0x", DekuSan.ErrorCode.CANCELED);
+        response = new Response(SendTransactionRequest.builder().get(), "0x", DekuSan.ErrorCode.CANCELED);
         assertTrue(response.isAvailable());
     }
 }

@@ -6,11 +6,15 @@ import android.os.Parcelable
 import android.util.Base64
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
+import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.Message
 
 @Parcelize
 open class BaseSignMessageRequest<V>(
-    private val chain: Blockchain = Blockchain.DEXON,
+    private val id: Int,
+    private val name: String,
+    private val chain: Blockchain,
+    private val from: Address?,
     private val message: Message<V>,
     private val callbackUri: Uri?
 ) : Request, Parcelable {
@@ -19,7 +23,10 @@ open class BaseSignMessageRequest<V>(
     val uri: Uri
 
     protected constructor(`in`: Parcel) : this(
+        id = `in`.readInt(),
+        name = `in`.readString()!!,
         chain = `in`.readParcelable<Blockchain>(Blockchain::class.java.classLoader)!!,
+        from = `in`.readParcelable<Address>(Address::class.java.classLoader)!!,
         message = `in`.readParcelable<Message<V>>(Message::class.java.classLoader)!!,
         callbackUri = `in`.readParcelable<Uri>(Uri::class.java.classLoader)!!
     )
@@ -43,7 +50,10 @@ open class BaseSignMessageRequest<V>(
         val uriBuilder = Uri.Builder()
             .scheme("dekusan")
             .authority(authority)
+            .appendQueryParameter(DekuSan.ExtraKey.ID, id.toString())
+            .appendQueryParameter(DekuSan.ExtraKey.NAME, name)
             .appendQueryParameter(DekuSan.ExtraKey.BLOCKCHAIN, chain.toString())
+            .appendQueryParameter(DekuSan.ExtraKey.FROM, from?.toString().orEmpty())
             .appendQueryParameter(DekuSan.ExtraKey.MESSAGE, String(value))
             .appendQueryParameter(DekuSan.ExtraKey.URL, message.url)
         if (callbackUri != null) {
@@ -68,8 +78,8 @@ open class BaseSignMessageRequest<V>(
         return 0
     }
 
-    override fun getChain(): Blockchain {
-        return chain
-    }
+    override fun getChain(): Blockchain = chain
+
+    override fun getAddress(): Address? = from
 
 }

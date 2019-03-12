@@ -4,12 +4,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.widget.Button
+import android.widget.RadioGroup
+import android.widget.Toast
 import com.squareup.moshi.Moshi
 import dekusan.*
 import org.dexon.dekusan.core.model.Address
 import pm.gnosis.eip712.adapters.moshi.MoshiAdapter
+import pm.gnosis.utils.addHexPrefix
 import pm.gnosis.utils.hexStringToByteArray
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -19,171 +21,109 @@ class MainActivity : AppCompatActivity() {
     private var signMessageCall: Call<SignMessageRequest>? = null
     private var signPersonalMessageCall: Call<SignPersonalMessageRequest>? = null
     private var signTypedMessageCall: Call<SignTypedMessageRequest>? = null
-    private var signTransactionCall: Call<SignTransactionRequest>? = null
     private var sendTransactionCall: Call<SendTransactionRequest>? = null
+    private var blockchain: Blockchain = Blockchain.DEXON
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.sign_transaction).setOnClickListener {
+        DekuSan.setAppName("myDapp")
+
+        findViewById<RadioGroup>(R.id.radioGroup_network).setOnCheckedChangeListener { group, checkedId ->
+            blockchain = when (checkedId) {
+                R.id.radioButton_ethereum -> Blockchain.ETHEREUM
+                else -> Blockchain.DEXON
+            }
+        }
+
+        findViewById<Button>(R.id.send_transaction).setOnClickListener {
             sendTransactionCall = DekuSan.sendTransaction()
-                .from(Address("0x9BCA773A36ECD81e08991982B24497adb7039E17"))
-                .recipient(Address("0x3637a62430C67Fe822f7136D2d9D74bDDd7A26C1"))
+                .blockchain(blockchain)
+//                .from(Address("0x9BCA773A36ECD81e08991982B24497adb7039E17"))
+//                .from(Address("0x3346d64b273a0255c10f9fee4bb06a000477af2a"))
+                .recipient(Address("0x0f46E6bc4495ad0fCdD806616F1cea0EE2CF230a"))
                 .gasPrice(BigInteger.valueOf(16000000000))
                 .gasLimit(21000)
                 .value(BigDecimal.valueOf(0.3).multiply(BigDecimal.TEN.pow(18)).toBigInteger())
                 .nonce(0)
                 .payload("0x")
                 .call(this)
-/*
-            signTransactionCall = DekuSan.signTransaction()
-                .recipient(Address("0x3637a62430C67Fe822f7136D2d9D74bDDd7A26C1"))
-                .gasPrice(BigInteger.valueOf(16000000000))
-                .gasLimit(21000)
-                .value(BigDecimal.valueOf(0.3).multiply(BigDecimal.TEN.pow(18)).toBigInteger())
-                .nonce(0)
-                .payload("0x")
-                .call(this)
-*/
         }
 
         findViewById<Button>(R.id.sign_message).setOnClickListener {
             signMessageCall = DekuSan.signMessage()
+                .blockchain(blockchain)
+                .from(Address("0x9BCA773A36ECD81e08991982B24497adb7039E17"))
+//                .from(Address("0x3346d64b273a0255c10f9fee4bb06a000477af2a"))
+//                .from(Address("0x3750063d24e9b12691c4e724ecf0e243784071ee"))
+//                .from(Address("0xcc3927f890a1e840cd493f0c752565da755f7091"))
                 .message("Hello world!!!")
                 .call(this)
         }
         findViewById<Button>(R.id.sign_msg_with_callback).setOnClickListener {
             signMessageCall = DekuSan.signMessage()
+                .blockchain(blockchain)
                 .message("Hello world!!!")
                 .callbackUri(Uri.parse("https://google.com/search?q=dexon").toString())
                 .call(this)
         }
         findViewById<Button>(R.id.sign_personal_message).setOnClickListener {
             signPersonalMessageCall = DekuSan.signPersonalMessage()
-                .message("personal message to be signed")
+                .blockchain(blockchain)
+                .message("Any Message you wanna sign")
                 .call(this)
         }
         findViewById<Button>(R.id.sign_typed_message).setOnClickListener {
-            val inputSource = "{\n" +
-                    "  \"types\":{\n" +
-                    "    \"EIP712Domain\":[\n" +
-                    "      {\n" +
-                    "        \"name\":\"name\",\n" +
-                    "        \"type\":\"string\"\n" +
-                    "      },\n" +
-                    "      {\n" +
-                    "        \"name\":\"version\",\n" +
-                    "        \"type\":\"string\"\n" +
-                    "      },\n" +
-                    "      {\n" +
-                    "        \"name\":\"chainId\",\n" +
-                    "        \"type\":\"uint256\"\n" +
-                    "      },\n" +
-                    "      {\n" +
-                    "        \"name\":\"verifyingContract\",\n" +
-                    "        \"type\":\"address\"\n" +
-                    "      }\n" +
-                    "    ],\n" +
-                    "    \"Person\":[\n" +
-                    "      {\n" +
-                    "        \"name\":\"name\",\n" +
-                    "        \"type\":\"string\"\n" +
-                    "      },\n" +
-                    "      {\n" +
-                    "        \"name\":\"wallet\",\n" +
-                    "        \"type\":\"address\"\n" +
-                    "      }\n" +
-                    "    ],\n" +
-                    "    \"Mail\":[\n" +
-                    "      {\n" +
-                    "        \"name\":\"from\",\n" +
-                    "        \"type\":\"Person\"\n" +
-                    "      },\n" +
-                    "      {\n" +
-                    "        \"name\":\"to\",\n" +
-                    "        \"type\":\"Person\"\n" +
-                    "      },\n" +
-                    "      {\n" +
-                    "        \"name\":\"contents\",\n" +
-                    "        \"type\":\"string\"\n" +
-                    "      }\n" +
-                    "    ]\n" +
-                    "  },\n" +
-                    "  \"primaryType\":\"Mail\",\n" +
-                    "  \"domain\":{\n" +
-                    "    \"name\":\"Ether Mail\",\n" +
-                    "    \"version\":\"1\",\n" +
-                    "    \"chainId\":1,\n" +
-                    "    \"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\"\n" +
-                    "  },\n" +
-                    "  \"message\":{\n" +
-                    "    \"from\":{\n" +
-                    "      \"name\":\"Cow\",\n" +
-                    "      \"wallet\":\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"\n" +
-                    "    },\n" +
-                    "    \"to\":{\n" +
-                    "      \"name\":\"Bob\",\n" +
-                    "      \"wallet\":\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"\n" +
-                    "    },\n" +
-                    "    \"contents\":\"Hello,\n" +
-                    "     Bob!\"\n" +
-                    "  }\n" +
-                    "}"
+            val inputSource =
+                "{\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallet\",\"type\":\"address\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person\"},{\"name\":\"contents\",\"type\":\"string\"}]},\"primaryType\":\"Mail\",\"domain\":{\"name\":\"Ether Mail\",\"version\":\"1\",\"chainId\":238,\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\"},\"message\":{\"from\":{\"name\":\"Cow\",\"wallet\":\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"},\"to\":{\"name\":\"Bob\",\"wallet\":\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"},\"contents\":\"Hello, Bob!\"}}"
 //            val domainWithMessage = EIP712JsonParser(MoshiAdapter()).parseMessage(inputSource)
 //            val adapter = Moshi.Builder().build().adapter(EIP712JsonAdapter.Result::class.java)
 //            val json = adapter.toJson(MoshiAdapter().parse(inputSource))
-            val typedDataAdapter = Moshi.Builder().build().adapter(MoshiAdapter.TypedData::class.java)
+            val typedDataAdapter =
+                Moshi.Builder().build().adapter(MoshiAdapter.TypedData::class.java)
             val typedData = typedDataAdapter.fromJson(inputSource)
-            signTypedMessageCall = DekuSan.signTypedMessage()
-                .message(typedData)
-                .call(this)
+            typedData?.let {
+                signTypedMessageCall = DekuSan.signTypedMessage()
+                    .blockchain(blockchain)
+                    .message(typedData)
+                    .call(this)
+            }
         }
 
         if (savedInstanceState != null) {
             signMessageCall = savedInstanceState.getParcelable("message_sign_call")
-            signTransactionCall = savedInstanceState.getParcelable("transaction_sign_call")
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        sendTransactionCall?.let {
+            it.onActivityResult(requestCode, resultCode, data, onComplete())
+        }
         signMessageCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, OnCompleteListener { response ->
-                val result = response.result ?: ""
-                Log.d(
-                    "SIGN_TAG",
-                    "Data: " + (String(result.hexStringToByteArray()) + "; Error: " + response.error)
-                )
-            })
+            it.onActivityResult(requestCode, resultCode, data, onComplete())
         }
         signPersonalMessageCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, OnCompleteListener { response ->
-                Log.d("SIGN_TAG", "Data: " + response.result + "; Error: " + response.error)
-            })
-        }
-        signTransactionCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, OnCompleteListener { response ->
-                Log.d("SIGN_TAG", "Data: " + response.result + "; Error: " + response.error)
-            })
+            it.onActivityResult(requestCode, resultCode, data, onComplete())
         }
         signTypedMessageCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, OnCompleteListener { response ->
-                val result = response.result ?: ""
-                Log.d(
-                    "SIGN_TAG",
-                    "Data: " + (String(result.hexStringToByteArray()) + "; Error: " + response.error)
-                )
-            })
+            it.onActivityResult(requestCode, resultCode, data, onComplete())
         }
     }
 
+    private fun <T : Request> onComplete(): OnCompleteListener<T> =
+        OnCompleteListener { response ->
+            if (response.isSuccess) {
+                println(String(response.result.orEmpty().hexStringToByteArray()).addHexPrefix())
+            } else {
+                Toast.makeText(this@MainActivity, "Error:${response.error}", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        signTransactionCall.let {
-            outState!!.putParcelable("transaction_sign_call", signTransactionCall)
-        }
         signMessageCall.let {
             outState!!.putParcelable("message_sign_call", signMessageCall)
         }

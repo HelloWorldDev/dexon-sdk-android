@@ -5,11 +5,34 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <Button
-        android:id="@+id/sign_transaction"
+    <RadioGroup
+        android:id="@+id/radioGroup_network"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/sign_transaction" />
+        android:checkedButton="@id/radioButton_dexon"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioButton_dexon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="DEXON" />
+
+        <RadioButton
+            android:id="@+id/radioButton_ethereum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="ETHEREUM" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/send_transaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/send_transaction" />
 
     <Button
         android:id="@+id/sign_message"

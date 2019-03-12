@@ -8,7 +8,6 @@ import android.net.Uri;
 
 public abstract class DekuSan {
 
-    public static final String ACTION_SIGN_TRANSACTION = "sign-transaction";
     public static final String ACTION_SEND_TRANSACTION = "send-transaction";
     public static final String ACTION_SIGN_MESSAGE = "sign-message";
     public static final String ACTION_SIGN_PERSONAL_MESSAGE = "sign-personal-message";
@@ -20,10 +19,16 @@ public abstract class DekuSan {
 
     private static String packageName = "org.dexon.dekusan";
 
+    protected static String appName = "dapp";
+
     private DekuSan() {}
 
     public static void setWalletAppPackageName(String packageName) {
         DekuSan.packageName = packageName;
+    }
+
+    public static void setAppName(String appName) {
+        DekuSan.appName = appName;
     }
 
     public static SendTransactionRequest.Builder sendTransaction() {
@@ -31,15 +36,15 @@ public abstract class DekuSan {
     }
 
     public static SignMessageRequest.Builder signMessage() {
-        return SignMessageRequest.builder();
+        return SignMessageRequest.Companion.builder();
     }
 
     public static SignPersonalMessageRequest.Builder signPersonalMessage() {
-        return SignPersonalMessageRequest.builder();
+        return SignPersonalMessageRequest.Companion.builder();
     }
 
     public static SignTypedMessageRequest.Builder signTypedMessage() {
-        return SignTypedMessageRequest.builder();
+        return SignTypedMessageRequest.Companion.builder();
     }
 
     public static <T extends Request> Call<T> execute(final Activity activity, T request) {
@@ -83,6 +88,8 @@ public abstract class DekuSan {
         String URL = "url";
         String CALLBACK_URI = "callback";
         String BLOCKCHAIN = "blockchain";
+        String NAME = "name";
+        String ID = "id";
     }
 
     public interface ErrorCode {

@@ -25,10 +25,16 @@ class SendTransactionRequest : Request, Parcelable {
     private val callbackUri: Uri?
     private val uri: Uri?
 
-    private constructor(transaction: Transaction, callbackUri: Uri?) {
+    private constructor(
+        id: Int,
+        name: String,
+        blockchain: Blockchain?,
+        transaction: Transaction,
+        callbackUri: Uri?
+    ) {
         this.transaction = transaction
         this.callbackUri = callbackUri
-        this.uri = toUri(transaction, callbackUri)
+        this.uri = toUri(id, name, blockchain ?: Blockchain.DEXON, transaction, callbackUri)
     }
 
     private constructor(`in`: Parcel) {
@@ -53,6 +59,8 @@ class SendTransactionRequest : Request, Parcelable {
         return 0
     }
 
+    override fun getAddress(): Address? = transaction?.from
+
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeParcelable(transaction, flags)
         dest.writeParcelable(callbackUri, flags)
@@ -60,6 +68,9 @@ class SendTransactionRequest : Request, Parcelable {
     }
 
     class Builder {
+        private var id: Int = (0..10000000).random()
+        private var name: String = DekuSan.appName
+        private var blockchain: Blockchain? = null
         private var from: Address? = null
         private var recipient: Address? = null
         private var value = BigInteger.ZERO
@@ -70,6 +81,11 @@ class SendTransactionRequest : Request, Parcelable {
         private var nonce: Long = 0
         private var leafPosition: Long = 0
         private var callbackUri: String? = null
+
+        fun blockchain(blockchain: Blockchain): Builder {
+            this.blockchain = blockchain
+            return this
+        }
 
         fun from(from: Address?): Builder {
             this.from = from
@@ -147,6 +163,9 @@ class SendTransactionRequest : Request, Parcelable {
         }
 
         fun uri(uri: Uri): Builder {
+            id = uri.getQueryParameter(DekuSan.ExtraKey.ID)?.toIntOrNull() ?: return this
+            name = uri.getQueryParameter(DekuSan.ExtraKey.NAME).orEmpty()
+            val blockchain = uri.getQueryParameter(DekuSan.ExtraKey.BLOCKCHAIN)
             val from = uri.getQueryParameter(DekuSan.ExtraKey.FROM)
             val recipient = uri.getQueryParameter(DekuSan.ExtraKey.RECIPIENT)
             val value = uri.getQueryParameter(DekuSan.ExtraKey.VALUE)
@@ -154,6 +173,11 @@ class SendTransactionRequest : Request, Parcelable {
             val gasPrice = uri.getQueryParameter(DekuSan.ExtraKey.GAS_PRICE)
             val gasLimit = uri.getQueryParameter(DekuSan.ExtraKey.GAS_LIMIT)
             val nonce = uri.getQueryParameter(DekuSan.ExtraKey.NONCE)
+
+            blockchain?.let {
+                Blockchain.values().firstOrNull { it.toString().equals(blockchain, true) }
+                    ?.apply { blockchain(this) }
+            }
             from?.takeIf { it.isValidEthereumAddress() }?.apply { from(Address(this)) }
             recipient?.takeIf { it.isValidEthereumAddress() }?.apply { recipient(Address(this)) }
             value(value?.toBigIntegerOrNull() ?: BigInteger.ZERO)
@@ -169,7 +193,10 @@ class SendTransactionRequest : Request, Parcelable {
 
         fun get(): SendTransactionRequest {
             val transaction = createTransactionWithDefaults(
-                chain = ChainDefinition(238L, "DXN"),
+                chain = when (blockchain) {
+                    Blockchain.ETHEREUM -> ChainDefinition(4L, "ETH")
+                    else -> ChainDefinition(238L, "DXN")
+                },
                 from = from,
                 gasLimit = gasLimit.toBigInteger(),
                 gasPrice = gasPrice,
@@ -186,7 +213,7 @@ class SendTransactionRequest : Request, Parcelable {
                 }
 
             }
-            return SendTransactionRequest(transaction, callbackUri)
+            return SendTransactionRequest(id, name, blockchain, transaction, callbackUri)
         }
 
         fun call(activity: Activity): Call<SendTransactionRequest>? {
@@ -196,10 +223,19 @@ class SendTransactionRequest : Request, Parcelable {
 
     companion object {
 
-        private fun toUri(transaction: Transaction, callbackUri: Uri?): Uri {
+        private fun toUri(
+            id: Int,
+            name: String,
+            chain: Blockchain,
+            transaction: Transaction,
+            callbackUri: Uri?
+        ): Uri {
             val uriBuilder = Uri.Builder()
                 .scheme("dekusan")
                 .authority(DekuSan.ACTION_SEND_TRANSACTION)
+                .appendQueryParameter(DekuSan.ExtraKey.ID, id.toString())
+                .appendQueryParameter(DekuSan.ExtraKey.NAME, name)
+                .appendQueryParameter(DekuSan.ExtraKey.BLOCKCHAIN, chain.toString())
                 .appendQueryParameter(
                     DekuSan.ExtraKey.FROM,
                     transaction.from?.toString().orEmpty()
