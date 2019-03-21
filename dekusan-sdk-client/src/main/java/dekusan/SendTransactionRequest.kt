@@ -10,8 +10,10 @@ import org.dexon.dekusan.core.functions.isTokenTransfer
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.ChainDefinition
 import org.dexon.dekusan.core.model.Transaction
+import org.dexon.dekusan.core.model.createTransactionWithDefaults
 import org.kethereum.DEFAULT_GAS_LIMIT
 import org.kethereum.DEFAULT_GAS_PRICE
+import org.kethereum.model.createTransactionWithDefaults
 import org.walleth.khex.hexToByteArray
 import org.walleth.khex.toHexString
 import pm.gnosis.utils.isValidEthereumAddress
@@ -150,15 +152,21 @@ class SendTransactionRequest : Request, Parcelable {
             return this
         }
 
+        fun leafPosition(leafPosition: Long): Builder {
+            this.leafPosition = leafPosition
+            return this
+        }
+
         fun transaction(transaction: Transaction): Builder {
             from(transaction.from)
                 .recipient(if (transaction.isTokenTransfer()) transaction.getTokenTransferTo() else transaction.to)
-                .contractAddress(transaction.getTokenTransferTo())
+                .contractAddress(if (transaction.isTokenTransfer()) transaction.getTokenTransferTo() else null)
                 .value(transaction.value)
                 .gasLimit(transaction.gasLimit.toLong())
                 .gasPrice(transaction.gasPrice)
                 .payload(transaction.input)
-                .nonce(transaction.nonce!!.toLong())
+                .nonce(transaction.nonce?.toLong() ?: BigInteger.ZERO.toLong())
+                .leafPosition(transaction.leafPosition ?: 0L)
             return this
         }
 
@@ -188,6 +196,8 @@ class SendTransactionRequest : Request, Parcelable {
                 ?.apply { contractAddress(Address(this)) }
             nonce(nonce?.toLongOrNull() ?: 0L)
             callbackUri(uri.getQueryParameter("callback"))
+            leafPosition =
+                uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION)?.toLongOrNull() ?: 0L
             return this
         }
 
@@ -203,7 +213,8 @@ class SendTransactionRequest : Request, Parcelable {
                 input = payload?.hexToByteArray()?.toList() ?: emptyList(),
                 nonce = BigInteger.ZERO,
                 to = recipient,
-                value = value
+                value = value,
+                leafPosition = leafPosition
             )
             var callbackUri: Uri? = null
             if (!TextUtils.isEmpty(this.callbackUri)) {
@@ -283,30 +294,6 @@ class SendTransactionRequest : Request, Parcelable {
             }
     }
 }
-
-fun createTransactionWithDefaults(
-    chain: ChainDefinition? = null,
-    creationEpochSecond: Long? = null,
-    from: Address?,
-    gasLimit: BigInteger = DEFAULT_GAS_LIMIT,
-    gasPrice: BigInteger = DEFAULT_GAS_PRICE,
-    input: List<Byte> = emptyList(),
-    nonce: BigInteger? = null,
-    to: Address?,
-    txHash: String? = null,
-    value: BigInteger
-) = Transaction(
-    chain,
-    creationEpochSecond,
-    from,
-    gasLimit,
-    gasPrice,
-    input,
-    nonce,
-    to,
-    txHash,
-    value
-)
 
 fun <T : Parcelable> Parcel.readParcelable(creator: Parcelable.Creator<T>): T? {
     return if (readString() != null) creator.createFromParcel(this) else null

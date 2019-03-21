@@ -52,6 +52,7 @@ class SignMessageRequest : BaseSignMessageRequest<String>, Request, Parcelable {
         private var from: Address? = null
         private var message: String? = null
         private var callbackUri: String? = null
+        private var leafPosition: Long = 0
         private var url: String? = null
 
         fun blockchain(blockchain: Blockchain): Builder {
@@ -97,12 +98,19 @@ class SignMessageRequest : BaseSignMessageRequest<String>, Request, Parcelable {
             from?.takeIf { it.isValidEthereumAddress() }?.apply { from(Address(this)) }
             url = uri.getQueryParameter(DekuSan.ExtraKey.URL)
             callbackUri = uri.getQueryParameter(DekuSan.ExtraKey.CALLBACK_URI)
-
+            leafPosition =
+                uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION)?.toLongOrNull() ?: 0L
             return this
         }
 
         fun message(message: Message<String>): Builder {
             message(message.value).url(message.url)
+            message.leafPosition?.apply { leafPosition(this) }
+            return this
+        }
+
+        fun leafPosition(leafPosition: Long): Builder {
+            this.leafPosition = leafPosition
             return this
         }
 
@@ -113,9 +121,8 @@ class SignMessageRequest : BaseSignMessageRequest<String>, Request, Parcelable {
                     callbackUri = Uri.parse(this.callbackUri)
                 } catch (ex: Exception) { /* Quietly */
                 }
-
             }
-            val message = Message<String>(this.message.orEmpty(), url)
+            val message = Message(this.message.orEmpty(), this.url, this.leafPosition)
             return SignMessageRequest(id, name, blockchain, from, message, callbackUri)
         }
 

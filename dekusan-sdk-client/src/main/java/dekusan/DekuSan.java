@@ -31,6 +31,10 @@ public abstract class DekuSan {
         DekuSan.appName = appName;
     }
 
+    public static String getAppName() {
+        return appName;
+    }
+
     public static SendTransactionRequest.Builder sendTransaction() {
         return SendTransactionRequest.builder();
     }
@@ -83,7 +87,7 @@ public abstract class DekuSan {
         String CONTRACT = "contract";
         String PAYLOAD = "data";
         String NONCE = "nonce";
-//        String LEAF_POSITION = "leaf_position";
+        String LEAF_POSITION = "leaf_position";
         String MESSAGE = "message";
         String URL = "url";
         String CALLBACK_URI = "callback";

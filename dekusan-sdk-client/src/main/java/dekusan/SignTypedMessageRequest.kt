@@ -13,6 +13,7 @@ import org.dexon.dekusan.core.model.Message
 import pm.gnosis.eip712.adapters.moshi.MoshiAdapter
 import pm.gnosis.utils.isValidEthereumAddress
 
+
 class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, Request,
     Parcelable {
 
@@ -58,6 +59,7 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, 
         private var from: Address? = null
         private var message: MoshiAdapter.TypedData? = null
         private var callbackUri: String? = null
+        private var leafPosition: Long = 0
         private var url: String? = null
 
         fun blockchain(blockchain: Blockchain): Builder {
@@ -105,11 +107,19 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, 
             from?.takeIf { it.isValidEthereumAddress() }?.apply { from(Address(this)) }
             message = Gson().fromJson<MoshiAdapter.TypedData>(json, MoshiAdapter.TypedData::class.java)
             callbackUri = uri.getQueryParameter(DekuSan.ExtraKey.CALLBACK_URI)
+            leafPosition =
+                uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION)?.toLongOrNull() ?: 0L
             return this
         }
 
         fun message(message: Message<MoshiAdapter.TypedData>): Builder {
             message(message.value).url(message.url)
+            message.leafPosition?.apply { leafPosition(this) }
+            return this
+        }
+
+        fun leafPosition(leafPosition: Long): Builder {
+            this.leafPosition = leafPosition
             return this
         }
 
@@ -120,9 +130,12 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, 
                     callbackUri = Uri.parse(this.callbackUri)
                 } catch (ex: Exception) { /* Quietly */
                 }
-
             }
-            val message = Message<MoshiAdapter.TypedData>(this.message ?: throw Exception(), url)
+            val message = Message(
+                this.message ?: throw Exception(),
+                this.url,
+                this.leafPosition
+            )
             return SignTypedMessageRequest(id, name, blockchain, from, message, callbackUri)
         }
 
