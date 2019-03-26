@@ -1,4 +1,4 @@
-package dekusan
+package org.dexon
 
 import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
@@ -7,9 +7,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.util.Base64
-import dekusan.DekuSan.ErrorCode.CANCELED
-import dekusan.DekuSan.ErrorCode.NONE
-import dekusan.DekuSan.RESULT_ERROR
+import org.dexon.DekuSan.ErrorCode.CANCELED
+import org.dexon.DekuSan.ErrorCode.NONE
+import org.dexon.DekuSan.RESULT_ERROR
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.Message
 import org.dexon.dekusan.core.model.Transaction

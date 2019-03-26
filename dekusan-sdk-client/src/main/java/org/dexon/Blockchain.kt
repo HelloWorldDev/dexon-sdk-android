@@ -1,4 +1,4 @@
-package dekusan
+package org.dexon
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

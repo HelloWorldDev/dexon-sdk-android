@@ -8,7 +8,8 @@ import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.Toast
 import com.squareup.moshi.Moshi
-import dekusan.*
+import org.dexon.*
+import org.dexon.OnCompleteListener
 import org.dexon.dekusan.core.model.Address
 import pm.gnosis.eip712.adapters.moshi.MoshiAdapter
 import pm.gnosis.utils.addHexPrefix

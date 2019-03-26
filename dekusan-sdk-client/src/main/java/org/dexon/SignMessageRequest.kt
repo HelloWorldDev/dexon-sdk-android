@@ -1,4 +1,4 @@
-package dekusan
+package org.dexon
 
 import android.app.Activity
 import android.net.Uri
@@ -133,8 +133,8 @@ class SignMessageRequest : BaseSignMessageRequest<String>, Request, Parcelable {
 
     companion object {
 
-        fun builder(): SignMessageRequest.Builder {
-            return SignMessageRequest.Builder()
+        fun builder(): Builder {
+            return Builder()
         }
     }
 }

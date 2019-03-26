@@ -1,4 +1,4 @@
-package dekusan
+package org.dexon
 
 import android.net.Uri
 import android.os.Parcel

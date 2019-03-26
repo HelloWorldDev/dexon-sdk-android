@@ -1,4 +1,4 @@
-package dekusan;
+package org.dexon;
 
 import android.app.Activity;
 import android.content.Context;

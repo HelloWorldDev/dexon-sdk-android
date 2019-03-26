@@ -1,4 +1,4 @@
-package dekusan
+package org.dexon
 
 import android.app.Activity
 import android.net.Uri
@@ -11,9 +11,6 @@ import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.ChainDefinition
 import org.dexon.dekusan.core.model.Transaction
 import org.dexon.dekusan.core.model.createTransactionWithDefaults
-import org.kethereum.DEFAULT_GAS_LIMIT
-import org.kethereum.DEFAULT_GAS_PRICE
-import org.kethereum.model.createTransactionWithDefaults
 import org.walleth.khex.hexToByteArray
 import org.walleth.khex.toHexString
 import pm.gnosis.utils.isValidEthereumAddress
@@ -36,7 +33,13 @@ class SendTransactionRequest : Request, Parcelable {
     ) {
         this.transaction = transaction
         this.callbackUri = callbackUri
-        this.uri = toUri(id, name, blockchain ?: Blockchain.DEXON, transaction, callbackUri)
+        this.uri = toUri(
+            id,
+            name,
+            blockchain ?: Blockchain.DEXON,
+            transaction,
+            callbackUri
+        )
     }
 
     private constructor(`in`: Parcel) {

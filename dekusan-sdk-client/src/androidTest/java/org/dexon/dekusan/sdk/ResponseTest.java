@@ -5,9 +5,9 @@ import androidx.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import dekusan.DekuSan;
-import dekusan.Response;
-import dekusan.SendTransactionRequest;
+import org.dexon.DekuSan;
+import org.dexon.Response;
+import org.dexon.SendTransactionRequest;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;

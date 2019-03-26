@@ -1,4 +1,4 @@
-package dekusan
+package org.dexon
 
 import android.app.Activity
 import android.net.Uri
@@ -6,32 +6,24 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Base64
-import android.util.Log
-import com.google.gson.Gson
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.Message
-import pm.gnosis.eip712.adapters.moshi.MoshiAdapter
 import pm.gnosis.utils.isValidEthereumAddress
 
-
-class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, Request,
-    Parcelable {
+class SignPersonalMessageRequest : BaseSignMessageRequest<String>, Request, Parcelable {
 
     override val data: ByteArray
-        get() {
-            val body = body<Message<MoshiAdapter.TypedData>>()
-            return Gson().toJson(body!!.value).toByteArray()
-        }
+        get() = (body<Any>() as Message<String>).value.toByteArray()
 
     override val authority: String
-        get() = DekuSan.ACTION_SIGN_TYPED_MESSAGE
+        get() = DekuSan.ACTION_SIGN_PERSONAL_MESSAGE
 
     private constructor(
         id: Int,
         name: String,
         blockchain: Blockchain?,
         from: Address?,
-        message: Message<MoshiAdapter.TypedData>,
+        message: Message<String>,
         callbackUri: Uri?
     ) : super(
         id,
@@ -57,7 +49,7 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, 
         private var name: String = DekuSan.appName
         private var blockchain: Blockchain? = null
         private var from: Address? = null
-        private var message: MoshiAdapter.TypedData? = null
+        private var message: String? = null
         private var callbackUri: String? = null
         private var leafPosition: Long = 0
         private var url: String? = null
@@ -72,7 +64,7 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, 
             return this
         }
 
-        fun message(message: MoshiAdapter.TypedData): Builder {
+        fun message(message: String): Builder {
             this.message = message
             return this
         }
@@ -88,31 +80,30 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, 
         }
 
         fun uri(uri: Uri): Builder {
-            if (DekuSan.ACTION_SIGN_TYPED_MESSAGE != uri.authority) {
+            if (DekuSan.ACTION_SIGN_PERSONAL_MESSAGE != uri.authority) {
                 throw IllegalArgumentException("Illegal message")
             }
 
             id = uri.getQueryParameter(DekuSan.ExtraKey.ID)?.toIntOrNull() ?: return this
             name = uri.getQueryParameter(DekuSan.ExtraKey.NAME).orEmpty()
             val blockchain = uri.getQueryParameter(DekuSan.ExtraKey.BLOCKCHAIN)
-            val from = uri.getQueryParameter(DekuSan.ExtraKey.FROM)
-            val value = uri.getQueryParameter(DekuSan.ExtraKey.MESSAGE)
-            val json = String(Base64.decode(value, Base64.DEFAULT))
-            Log.e("JSON", json)
 
             blockchain?.let {
                 Blockchain.values().firstOrNull { it.toString().equals(blockchain, true) }
                     ?.apply { blockchain(this) }
             }
+            val from = uri.getQueryParameter(DekuSan.ExtraKey.FROM)
+            val value = uri.getQueryParameter(DekuSan.ExtraKey.MESSAGE)
             from?.takeIf { it.isValidEthereumAddress() }?.apply { from(Address(this)) }
-            message = Gson().fromJson<MoshiAdapter.TypedData>(json, MoshiAdapter.TypedData::class.java)
+            message = String(Base64.decode(value, Base64.DEFAULT))
+            url = uri.getQueryParameter(DekuSan.ExtraKey.URL)
             callbackUri = uri.getQueryParameter(DekuSan.ExtraKey.CALLBACK_URI)
             leafPosition =
                 uri.getQueryParameter(DekuSan.ExtraKey.LEAF_POSITION)?.toLongOrNull() ?: 0L
             return this
         }
 
-        fun message(message: Message<MoshiAdapter.TypedData>): Builder {
+        fun message(message: Message<String>): Builder {
             message(message.value).url(message.url)
             message.leafPosition?.apply { leafPosition(this) }
             return this
@@ -123,31 +114,35 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>, 
             return this
         }
 
-        fun get(): SignTypedMessageRequest {
+        fun get(): SignPersonalMessageRequest {
             var callbackUri: Uri? = null
             if (!TextUtils.isEmpty(this.callbackUri)) {
                 try {
                     callbackUri = Uri.parse(this.callbackUri)
                 } catch (ex: Exception) { /* Quietly */
                 }
+
             }
-            val message = Message(
-                this.message ?: throw Exception(),
-                this.url,
-                this.leafPosition
+            val message = Message(this.message.orEmpty(), this.url, this.leafPosition)
+            return SignPersonalMessageRequest(
+                id,
+                name,
+                blockchain,
+                from,
+                message,
+                callbackUri
             )
-            return SignTypedMessageRequest(id, name, blockchain, from, message, callbackUri)
         }
 
-        fun call(activity: Activity): Call<SignTypedMessageRequest>? {
+        fun call(activity: Activity): Call<SignPersonalMessageRequest>? {
             return DekuSan.execute(activity, get())
         }
     }
 
     companion object {
 
-        fun builder(): SignTypedMessageRequest.Builder {
-            return SignTypedMessageRequest.Builder()
+        fun builder(): Builder {
+            return Builder()
         }
     }
 }

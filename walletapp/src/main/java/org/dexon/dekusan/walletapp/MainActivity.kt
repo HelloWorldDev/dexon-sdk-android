@@ -5,7 +5,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import com.google.gson.Gson
-import dekusan.SignRequestHelper
+import org.dexon.SignRequestHelper
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.Message
 import org.dexon.dekusan.core.model.Transaction
