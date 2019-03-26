@@ -13,7 +13,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -50,9 +50,9 @@ dependencies {
     api "com.github.walleth.kethereum:wallet:$project.kethereum_version"
 
     implementation "com.google.code.gson:gson:$project.gsonVersion"
-    implementation "com.android.support:appcompat-v7:$project.supportVersion"
+    implementation "androidx.appcompat:appcompat:1.0.0-beta01"
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
 }
