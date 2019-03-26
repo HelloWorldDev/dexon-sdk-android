@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 
+import androidx.fragment.app.Fragment;
+
 public abstract class DekuSan {
 
     public static final String ACTION_SEND_TRANSACTION = "send-transaction";
@@ -49,6 +51,27 @@ public abstract class DekuSan {
 
     public static SignTypedMessageRequest.Builder signTypedMessage() {
         return SignTypedMessageRequest.Companion.builder();
+    }
+
+    public static <T extends Request> Call<T> execute(final Fragment fragment, T request) {
+        final Intent intent = new Intent();
+        intent.setData(request.key());
+        if (fragment.getContext() == null) return null;
+        if (canStartActivity(fragment.getContext(), intent)) {
+            fragment.startActivityForResult(intent, REQUEST_CODE_SIGN);
+            return new Call<>(request);
+        } else {
+            try {
+                fragment.startActivity(new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=" + packageName)));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                fragment.startActivity(new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=" + packageName)));
+            }
+            return null;
+        }
     }
 
     public static <T extends Request> Call<T> execute(final Activity activity, T request) {

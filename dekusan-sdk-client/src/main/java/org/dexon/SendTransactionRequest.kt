@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
+import androidx.fragment.app.Fragment
 import org.dexon.dekusan.core.functions.getTokenTransferTo
 import org.dexon.dekusan.core.functions.isTokenTransfer
 import org.dexon.dekusan.core.model.Address
@@ -233,6 +234,11 @@ class SendTransactionRequest : Request, Parcelable {
         fun call(activity: Activity): Call<SendTransactionRequest>? {
             return DekuSan.execute(activity, get())
         }
+
+        fun call(fragment: Fragment): Call<SendTransactionRequest>? {
+            return DekuSan.execute(fragment, get())
+        }
+
     }
 
     companion object {

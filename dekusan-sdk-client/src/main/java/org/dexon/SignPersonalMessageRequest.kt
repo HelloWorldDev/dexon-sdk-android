@@ -6,6 +6,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Base64
+import androidx.fragment.app.Fragment
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.Message
 import pm.gnosis.utils.isValidEthereumAddress
@@ -137,6 +138,11 @@ class SignPersonalMessageRequest : BaseSignMessageRequest<String>, Request, Parc
         fun call(activity: Activity): Call<SignPersonalMessageRequest>? {
             return DekuSan.execute(activity, get())
         }
+
+        fun call(fragment: Fragment): Call<SignPersonalMessageRequest>? {
+            return DekuSan.execute(fragment, get())
+        }
+
     }
 
     companion object {

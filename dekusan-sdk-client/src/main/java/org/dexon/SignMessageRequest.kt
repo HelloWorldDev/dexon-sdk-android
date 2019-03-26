@@ -6,6 +6,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Base64
+import androidx.fragment.app.Fragment
 
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.Message
@@ -129,6 +130,11 @@ class SignMessageRequest : BaseSignMessageRequest<String>, Request, Parcelable {
         fun call(activity: Activity): Call<SignMessageRequest>? {
             return DekuSan.execute(activity, get())
         }
+
+        fun call(fragment: Fragment): Call<SignMessageRequest>? {
+            return DekuSan.execute(fragment, get())
+        }
+
     }
 
     companion object {

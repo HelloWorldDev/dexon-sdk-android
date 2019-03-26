@@ -7,6 +7,7 @@ import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
+import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.Message
@@ -150,6 +151,11 @@ class SignTypedMessageRequest : BaseSignMessageRequest<MoshiAdapter.TypedData>,
         fun call(activity: Activity): Call<SignTypedMessageRequest>? {
             return DekuSan.execute(activity, get())
         }
+
+        fun call(fragment: Fragment): Call<SignTypedMessageRequest>? {
+            return DekuSan.execute(fragment, get())
+        }
+
     }
 
     companion object {
