@@ -3,13 +3,12 @@ package org.dexon.dekusan.sdk
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.squareup.moshi.Moshi
 import org.dexon.*
-import org.dexon.OnCompleteListener
 import org.dexon.dekusan.core.model.Address
 import pm.gnosis.eip712.adapters.moshi.MoshiAdapter
 import pm.gnosis.utils.addHexPrefix
@@ -31,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         DekuSan.setAppName("myDapp")
 
-        findViewById<RadioGroup>(R.id.radioGroup_network).setOnCheckedChangeListener { group, checkedId ->
+        findViewById<RadioGroup>(R.id.radioGroup_network).setOnCheckedChangeListener { _, checkedId ->
             blockchain = when (checkedId) {
                 R.id.radioButton_ethereum -> Blockchain.ETHEREUM
                 else -> Blockchain.DEXON
@@ -99,18 +98,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        sendTransactionCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, onComplete())
-        }
-        signMessageCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, onComplete())
-        }
-        signPersonalMessageCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, onComplete())
-        }
-        signTypedMessageCall?.let {
-            it.onActivityResult(requestCode, resultCode, data, onComplete())
-        }
+        sendTransactionCall?.onActivityResult(requestCode, resultCode, data, onComplete())
+        signMessageCall?.onActivityResult(requestCode, resultCode, data, onComplete())
+        signPersonalMessageCall?.onActivityResult(requestCode, resultCode, data, onComplete())
+        signTypedMessageCall?.onActivityResult(requestCode, resultCode, data, onComplete())
     }
 
     private fun <T : Request> onComplete(): OnCompleteListener<T> =
@@ -123,10 +114,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         signMessageCall.let {
-            outState!!.putParcelable("message_sign_call", signMessageCall)
+            outState.putParcelable("message_sign_call", signMessageCall)
         }
     }
 }

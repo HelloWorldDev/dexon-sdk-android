@@ -105,20 +105,23 @@ class SignRequestHelper(intent: Intent, callback: Callback) {
 
     private fun result(activity: Activity, error: Int, sign: ByteArray?) {
         val intent = makeResultIntent(error, sign)
-        if (request!!.callbackUri == null) {
-            val code: Int
-            if (error != NONE) {
-                code = if (error == CANCELED) RESULT_CANCELED else RESULT_ERROR
-            } else {
-                code = RESULT_OK
+        when {
+            request?.callbackUri == null -> {
+                val code: Int = when {
+                    error != NONE -> when (error) {
+                        CANCELED -> RESULT_CANCELED
+                        else -> RESULT_ERROR
+                    }
+                    else -> RESULT_OK
+                }
+                activity.setResult(code, intent)
+                activity.finish()
             }
-            activity.setResult(code, intent)
-            activity.finish()
-        } else if (DekuSan.canStartActivity(activity, intent)) {
-            activity.startActivity(intent)
-            activity.finish()
-        } else {
-            AlertDialog.Builder(activity)
+            DekuSan.canStartActivity(activity, intent) -> {
+                activity.startActivity(intent)
+                activity.finish()
+            }
+            else -> AlertDialog.Builder(activity)
                 .setTitle("No application found")
                 .setMessage("No proper application to handle result")
                 .create()
@@ -130,13 +133,13 @@ class SignRequestHelper(intent: Intent, callback: Callback) {
         var error = error
         val intent = Intent(Intent.ACTION_VIEW)
         var signBase64: String? = null
-        if (sign != null && sign.size > 0) {
+        if (sign != null && sign.isNotEmpty()) {
             signBase64 = String(Base64.encode(sign, Base64.DEFAULT))
         } else if (error == NONE) {
             error = DekuSan.ErrorCode.INVALID_REQUEST
         }
-        var data = request!!.key()
-        if (request!!.callbackUri != null) {
+        var data = request?.key()
+        if (request?.callbackUri != null) {
             val dataBuilder = request!!.callbackUri!!.buildUpon()
                 .appendQueryParameter("src", getSrcUri(request!!.key()))
             if (error == NONE) {
