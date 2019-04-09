@@ -12,6 +12,7 @@ import org.dexon.dekusan.core.model.Address
 import org.dexon.dekusan.core.model.ChainDefinition
 import org.dexon.dekusan.core.model.Transaction
 import org.dexon.dekusan.core.model.createTransactionWithDefaults
+import org.kethereum.model.ChainId
 import org.walleth.khex.hexToByteArray
 import org.walleth.khex.toHexString
 import pm.gnosis.utils.isValidEthereumAddress
@@ -208,8 +209,8 @@ class SendTransactionRequest : Request, Parcelable {
         fun get(): SendTransactionRequest {
             val transaction = createTransactionWithDefaults(
                 chain = when (blockchain) {
-                    Blockchain.ETHEREUM -> ChainDefinition(4L, "ETH")
-                    else -> ChainDefinition(238L, "DXN")
+                    Blockchain.ETHEREUM -> ChainId(4L)
+                    else -> ChainId(238L)
                 },
                 from = from,
                 gasLimit = gasLimit.toBigInteger(),
