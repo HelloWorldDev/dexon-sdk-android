@@ -45,7 +45,7 @@ project.ext {
 }
 
 dependencies {
-    api 'com.github.dexon-foundation:dekusan-core-android:0.1.2'
+    api 'com.github.dexon-foundation:dekusan-core-android:4ec6a87045'
     api "com.github.walleth.kethereum:functions:$project.kethereum_version"
     api "com.github.walleth.kethereum:wallet:$project.kethereum_version"
 

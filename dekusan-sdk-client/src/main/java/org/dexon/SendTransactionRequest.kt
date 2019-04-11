@@ -9,10 +9,9 @@ import androidx.fragment.app.Fragment
 import org.dexon.dekusan.core.functions.getTokenTransferTo
 import org.dexon.dekusan.core.functions.isTokenTransfer
 import org.dexon.dekusan.core.model.Address
-import org.dexon.dekusan.core.model.ChainDefinition
+import org.dexon.dekusan.core.model.ChainId
 import org.dexon.dekusan.core.model.Transaction
 import org.dexon.dekusan.core.model.createTransactionWithDefaults
-import org.kethereum.model.ChainId
 import org.walleth.khex.hexToByteArray
 import org.walleth.khex.toHexString
 import pm.gnosis.utils.isValidEthereumAddress
