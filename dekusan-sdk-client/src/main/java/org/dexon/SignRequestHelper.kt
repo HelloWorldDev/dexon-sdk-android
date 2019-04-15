@@ -178,7 +178,7 @@ class SignRequestHelper(intent: Intent, callback: Callback) {
             DekuSan.ACTION_SEND_TRANSACTION
         )
 
-        private fun isSignUri(uri: Uri?): Boolean {
+        fun isSignUri(uri: Uri?): Boolean {
             return (uri != null && "dekusan" == uri.scheme
                     && authorities.contains(uri.authority))
         }
