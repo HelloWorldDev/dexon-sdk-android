@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "org.dexon.dekusan.sdk"
+        applicationId "org.dexon.wallet.sdk"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
@@ -28,6 +28,7 @@ dependencies {
     testImplementation 'junit:junit:4.13-beta-2'
     androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
-    implementation project(':dekusan-sdk-client')
+    implementation project(':wallet-sdk-client')
+    implementation 'com.github.dexon-foundation:dekusan-core-android:0.1.5'
     implementation 'com.squareup.moshi:moshi:1.8.0'
 }

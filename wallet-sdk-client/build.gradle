@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
@@ -6,7 +6,6 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        applicationId "org.dexon.wallet.walletapp"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
@@ -21,17 +20,38 @@ android {
         }
     }
 
+    task androidSourcesJar(type: Jar) {
+        from android.sourceSets.main.java.source
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives androidSourcesJar
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+apply plugin: 'com.github.dcendents.android-maven'
+group = 'com.github.dexon-foundation'
+version = '0.1.0'
+
+project.ext {
+    kethereum_version = "0.74.9"
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.github.dexon-foundation:dekusan-core-android:0.1.5'
+    api "com.github.walleth.kethereum:functions:$project.kethereum_version"
+    api "com.github.walleth.kethereum:wallet:$project.kethereum_version"
+
     implementation "com.google.code.gson:gson:2.8.5"
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
+    implementation "androidx.appcompat:appcompat:1.1.0-alpha04"
+
     testImplementation 'junit:junit:4.13-beta-2'
     androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
-    implementation project(':wallet-sdk-client')
-    implementation 'com.github.dexon-foundation:dekusan-core-android:0.1.5'
 }

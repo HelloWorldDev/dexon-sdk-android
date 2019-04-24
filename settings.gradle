@@ -1,1 +1,1 @@
-include ':app', ':dekusan-sdk-client', ':dekusan-sdk-wallet', ':walletapp'
+include ':app', ':wallet-sdk-client', ':wallet-sdk-wallet', ':walletapp'
