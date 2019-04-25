@@ -44,7 +44,7 @@ project.ext {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'com.github.dexon-foundation:dekusan-core-android:0.1.5'
+    implementation 'com.github.dexon-foundation:dexon-core-android:0.1.5'
     api "com.github.walleth.kethereum:functions:$project.kethereum_version"
     api "com.github.walleth.kethereum:wallet:$project.kethereum_version"
 
@@ -52,6 +52,6 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.1.0-alpha04"
 
     testImplementation 'junit:junit:4.13-beta-2'
-    androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
+    androidTestImplementation 'androidx.test:runner:1.2.0-alpha04'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha04'
 }
