@@ -1,5 +1,5 @@
-# DekuSanSDK-Android
-[![](https://jitpack.io/v/dexon-foundation/dekusan-sdk-android.svg)](https://jitpack.io/#dexon-foundation/dekusan-sdk-android/)
+# dexon-sdk-android
+[![](https://jitpack.io/v/dexon-foundation/dexon-sdk-android.svg)](https://jitpack.io/#dexon-foundation/dexon-sdk-android)
 
 ## Getting started
 
